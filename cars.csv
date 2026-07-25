@@ -1,0 +1,13 @@
+car_id,car_name,car_type,seats,fuel_type,price_per_day
+1,Maruti Swift,Hatchback,5,Petrol,1200
+2,Toyota Innova,SUV,7,Diesel,2500
+3,Honda City,Sedan,5,Petrol,1800
+4,Hyundai Creta,SUV,5,Diesel,2200
+5,Tata Nexon,SUV,5,Petrol,2000
+6,Maruti Baleno,Hatchback,5,Petrol,1300
+7,Mahindra XUV700,SUV,7,Diesel,2800
+8,Toyota Fortuner,SUV,7,Diesel,3500
+9,Hyundai i20,Hatchback,5,Petrol,1250
+10,Skoda Slavia,Sedan,5,Petrol,1900
+11,Kia Seltos,SUV,5,Petrol,2100
+12,Maruti Ertiga,SUV,7,Petrol,2000
