@@ -11,7 +11,9 @@ st.set_page_config(page_title="Car Booking App", page_icon="🚗", layout="wide"
 # ---------- Load data ----------
 @st.cache_data
 def load_cars():
-    return pd.read_csv("cars.csv")
+    df = pd.read_csv("cars.csv")
+    df.columns = df.columns.str.strip()
+    return df
 
 # ---------- Generate synthetic training data + train model (in-app, no pkl files needed) ----------
 @st.cache_resource
@@ -50,25 +52,56 @@ def train_fare_model():
 cars_df = load_cars()
 model, encoder = train_fare_model()
 
-# ---------- Simple login ----------
-# NOTE: this is a basic demo login (not secure for real production use)
-USERS = {"demo": "demo123", "admin": "admin123"}
+# ---------- Simple login + signup ----------
+# NOTE: this is a basic demo auth system (plain-text passwords, not secure for real production use)
+USERS_FILE = "users.csv"
+DEFAULT_USERS = {"demo": "demo123", "admin": "admin123"}
+
+def load_users():
+    if os.path.exists(USERS_FILE):
+        df = pd.read_csv(USERS_FILE)
+        return dict(zip(df["username"], df["password"]))
+    return {}
+
+def save_user(username, password):
+    users = load_users()
+    users[username] = password
+    df = pd.DataFrame(list(users.items()), columns=["username", "password"])
+    df.to_csv(USERS_FILE, index=False)
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 
 if not st.session_state.logged_in:
-    st.title("🔐 Login to Car Booking App")
-    st.caption("Demo credentials — username: `demo`  password: `demo123`")
-    username = st.text_input("Username")
-    password = st.text_input("Password", type="password")
-    if st.button("Login"):
-        if USERS.get(username) == password:
-            st.session_state.logged_in = True
-            st.session_state.username = username
-            st.rerun()
-        else:
-            st.error("Invalid username or password")
+    st.title("🔐 Car Booking App")
+    tab_login, tab_signup = st.tabs(["Login", "Sign Up"])
+
+    all_users = {**DEFAULT_USERS, **load_users()}
+
+    with tab_login:
+        st.caption("Demo credentials — username: `demo`  password: `demo123`")
+        username = st.text_input("Username", key="login_user")
+        password = st.text_input("Password", type="password", key="login_pass")
+        if st.button("Login"):
+            if all_users.get(username) == password:
+                st.session_state.logged_in = True
+                st.session_state.username = username
+                st.rerun()
+            else:
+                st.error("Invalid username or password")
+
+    with tab_signup:
+        new_username = st.text_input("Choose a username", key="signup_user")
+        new_password = st.text_input("Choose a password", type="password", key="signup_pass")
+        if st.button("Create account"):
+            if not new_username or not new_password:
+                st.error("Please enter both a username and password")
+            elif new_username in all_users:
+                st.error("That username is already taken")
+            else:
+                save_user(new_username, new_password)
+                st.success("Account created! You can now log in from the Login tab.")
+
     st.stop()  # stops the rest of the app from running until logged in
 
 # ---------- Logout button (shown once logged in) ----------
@@ -107,9 +140,9 @@ if page == "Browse & Book":
     with f2:
         fuel_filter = st.multiselect("Filter by fuel", options=cars_df["fuel_type"].unique())
     with f3:
-        max_price = st.slider("Max price per day (₹)", 
-                               min_value=int(cars_df["price_per_day"].min()), 
-                               max_value=int(cars_df["price_per_day"].max()), 
+        max_price = st.slider("Max price per day (₹)",
+                               min_value=int(cars_df["price_per_day"].min()),
+                               max_value=int(cars_df["price_per_day"].max()),
                                value=int(cars_df["price_per_day"].max()))
 
     filtered_cars = cars_df.copy()
@@ -119,8 +152,43 @@ if page == "Browse & Book":
         filtered_cars = filtered_cars[filtered_cars["fuel_type"].isin(fuel_filter)]
     filtered_cars = filtered_cars[filtered_cars["price_per_day"] <= max_price]
 
-    st.dataframe(filtered_cars, use_container_width=True)
     st.caption(f"Showing {len(filtered_cars)} of {len(cars_df)} cars")
+
+    # ---------- Car cards (visual grid instead of plain table) ----------
+    CAR_COLORS = {"Hatchback": "#4F8EF7", "Sedan": "#2ECC71", "SUV": "#F39C12"}
+    CAR_ICON = """
+    <svg width="90" height="50" viewBox="0 0 90 50" xmlns="http://www.w3.org/2000/svg">
+      <rect x="5" y="22" width="80" height="16" rx="4" fill="{color}"/>
+      <path d="M18 22 L28 8 H62 L72 22 Z" fill="{color}"/>
+      <path d="M30 21 L36 11 H54 L60 21 Z" fill="#EAF2FF"/>
+      <circle cx="24" cy="40" r="7" fill="#222"/>
+      <circle cx="24" cy="40" r="3" fill="#bbb"/>
+      <circle cx="66" cy="40" r="7" fill="#222"/>
+      <circle cx="66" cy="40" r="3" fill="#bbb"/>
+    </svg>
+    """
+
+    n_cols = 4
+    rows_of_cars = [filtered_cars.iloc[i:i+n_cols] for i in range(0, len(filtered_cars), n_cols)]
+    for chunk in rows_of_cars:
+        cols = st.columns(n_cols)
+        for col, (_, car) in zip(cols, chunk.iterrows()):
+            color = CAR_COLORS.get(car["car_type"], "#888")
+            with col:
+                st.markdown(
+                    f"""
+                    <div style="border:1px solid #e0e0e0; border-radius:12px; padding:14px; text-align:center; margin-bottom:12px;">
+                        {CAR_ICON.format(color=color)}
+                        <div style="font-weight:600; margin-top:6px;">{car['car_name']}</div>
+                        <div style="color:#666; font-size:13px;">{car['car_type']} · {car['seats']} seats · {car['fuel_type']}</div>
+                        <div style="font-weight:600; margin-top:4px;">₹{car['price_per_day']:,}/day</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+    with st.expander("📋 View as table"):
+        st.dataframe(filtered_cars, use_container_width=True)
 
     st.divider()
     st.header("📝 Book a Car & Predict Fare")
