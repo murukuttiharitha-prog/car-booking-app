@@ -174,17 +174,17 @@ if page == "Browse & Book":
         cols = st.columns(n_cols)
         for col, (_, car) in zip(cols, chunk.iterrows()):
             color = CAR_COLORS.get(car["car_type"], "#888")
+            icon = CAR_ICON.format(color=color).replace("\n", "").strip()
+            card_html = (
+                f'<div style="border:1px solid #e0e0e0; border-radius:12px; padding:14px; text-align:center; margin-bottom:12px;">'
+                f'{icon}'
+                f'<div style="font-weight:600; margin-top:6px;">{car["car_name"]}</div>'
+                f'<div style="color:#666; font-size:13px;">{car["car_type"]} · {car["seats"]} seats · {car["fuel_type"]}</div>'
+                f'<div style="font-weight:600; margin-top:4px;">₹{car["price_per_day"]:,}/day</div>'
+                f'</div>'
+            )
             with col:
-                st.markdown(
-                    f"""
-                    <div style="border:1px solid #e0e0e0; border-radius:12px; padding:14px; text-align:center; margin-bottom:12px;">
-                        {CAR_ICON.format(color=color)}
-                        <div style="font-weight:600; margin-top:6px;">{car['car_name']}</div>
-                        <div style="color:#666; font-size:13px;">{car['car_type']} · {car['seats']} seats · {car['fuel_type']}</div>
-                        <div style="font-weight:600; margin-top:4px;">₹{car['price_per_day']:,}/day</div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
+                st.markdown(card_html, unsafe_allow_html=True)
                 )
 
     with st.expander("📋 View as table"):
