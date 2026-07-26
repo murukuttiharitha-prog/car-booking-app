@@ -1,4 +1,5 @@
-Maruti Swift,Hatchback,5,Petrol,1200
+car_id,car_name,car_type,seats,fuel_type,price_per_day
+1,Maruti Swift,Hatchback,5,Petrol,1200
 2,Toyota Innova,SUV,7,Diesel,2500
 3,Honda City,Sedan,5,Petrol,1800
 4,Hyundai Creta,SUV,5,Diesel,2200
