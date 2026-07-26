@@ -1,5 +1,4 @@
-car_id,car_name,car_type,seats,fuel_type,price_per_day
-1,Maruti Swift,Hatchback,5,Petrol,1200
+Maruti Swift,Hatchback,5,Petrol,1200
 2,Toyota Innova,SUV,7,Diesel,2500
 3,Honda City,Sedan,5,Petrol,1800
 4,Hyundai Creta,SUV,5,Diesel,2200
@@ -11,3 +10,11 @@ car_id,car_name,car_type,seats,fuel_type,price_per_day
 10,Skoda Slavia,Sedan,5,Petrol,1900
 11,Kia Seltos,SUV,5,Petrol,2100
 12,Maruti Ertiga,SUV,7,Petrol,2000
+13,Hyundai Venue,SUV,5,Petrol,1900
+14,Renault Kwid,Hatchback,5,Petrol,900
+15,Volkswagen Virtus,Sedan,5,Petrol,2000
+16,Tata Punch,SUV,5,Petrol,1500
+17,Maruti Dzire,Sedan,5,Petrol,1400
+18,Mahindra Thar,SUV,4,Diesel,3000
+19,Honda Amaze,Sedan,5,Petrol,1450
+20,Toyota Glanza,Hatchback,5,Petrol,1350
