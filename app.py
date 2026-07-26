@@ -11,9 +11,7 @@ st.set_page_config(page_title="Car Booking App", page_icon="🚗", layout="wide"
 # ---------- Load data ----------
 @st.cache_data
 def load_cars():
-    df = pd.read_csv("cars.csv")
-    df.columns = df.columns.str.strip()
-    return df
+    return pd.read_csv("cars.csv")
 
 # ---------- Generate synthetic training data + train model (in-app, no pkl files needed) ----------
 @st.cache_resource
@@ -61,7 +59,7 @@ if "logged_in" not in st.session_state:
 
 if not st.session_state.logged_in:
     st.title("🔐 Login to Car Booking App")
-    st.caption("Demo credentials — username: demo  password: demo123")
+    st.caption("Demo credentials — username: `demo`  password: `demo123`")
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
     if st.button("Login"):
@@ -74,7 +72,7 @@ if not st.session_state.logged_in:
     st.stop()  # stops the rest of the app from running until logged in
 
 # ---------- Logout button (shown once logged in) ----------
-st.sidebar.write(f"👤 Logged in as *{st.session_state.username}*")
+st.sidebar.write(f"👤 Logged in as **{st.session_state.username}**")
 if st.sidebar.button("Log out"):
     st.session_state.logged_in = False
     st.rerun()
@@ -133,7 +131,7 @@ if page == "Browse & Book":
         car_name = st.selectbox("Choose a car", filtered_cars["car_name"] if len(filtered_cars) > 0 else cars_df["car_name"])
         car_row = cars_df[cars_df["car_name"] == car_name].iloc[0]
         car_type = car_row["car_type"]
-        st.write(f"*Type:* {car_type} | *Seats:* {car_row['seats']} | *Fuel:* {car_row['fuel_type']}")
+        st.write(f"**Type:** {car_type} | **Seats:** {car_row['seats']} | **Fuel:** {car_row['fuel_type']}")
 
         pickup_date = st.date_input("Pickup date", date.today())
         days = st.number_input("Number of days", min_value=1, max_value=30, value=3)
@@ -165,12 +163,12 @@ if page == "Browse & Book":
 
         c1, c2 = st.columns(2)
         with c1:
-            st.write(f"*Car:* {pred['car_name']} ({pred['car_type']})")
-            st.write(f"*Pickup date:* {pred['pickup_date']}")
-            st.write(f"*Duration:* {pred['days']} day(s)")
+            st.write(f"**Car:** {pred['car_name']} ({pred['car_type']})")
+            st.write(f"**Pickup date:** {pred['pickup_date']}")
+            st.write(f"**Duration:** {pred['days']} day(s)")
         with c2:
-            st.write(f"*Distance:* {pred['distance_km']} km")
-            st.write(f"*Weekend trip:* {'Yes' if pred['is_weekend'] else 'No'}")
+            st.write(f"**Distance:** {pred['distance_km']} km")
+            st.write(f"**Weekend trip:** {'Yes' if pred['is_weekend'] else 'No'}")
             st.metric("Estimated Fare", f"₹{pred['predicted_fare']:,.2f}")
 
         if st.button("🚗 Book Now", type="primary"):
