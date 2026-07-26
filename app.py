@@ -99,7 +99,28 @@ page = st.sidebar.radio("Go to", ["Browse & Book", "Booking History"])
 # ---------- Page 1: Browse & Book ----------
 if page == "Browse & Book":
     st.title("🚗 Available Cars")
-    st.dataframe(cars_df, use_container_width=True)
+
+    # ---------- Filters ----------
+    f1, f2, f3 = st.columns(3)
+    with f1:
+        type_filter = st.multiselect("Filter by type", options=cars_df["car_type"].unique())
+    with f2:
+        fuel_filter = st.multiselect("Filter by fuel", options=cars_df["fuel_type"].unique())
+    with f3:
+        max_price = st.slider("Max price per day (₹)", 
+                               min_value=int(cars_df["price_per_day"].min()), 
+                               max_value=int(cars_df["price_per_day"].max()), 
+                               value=int(cars_df["price_per_day"].max()))
+
+    filtered_cars = cars_df.copy()
+    if type_filter:
+        filtered_cars = filtered_cars[filtered_cars["car_type"].isin(type_filter)]
+    if fuel_filter:
+        filtered_cars = filtered_cars[filtered_cars["fuel_type"].isin(fuel_filter)]
+    filtered_cars = filtered_cars[filtered_cars["price_per_day"] <= max_price]
+
+    st.dataframe(filtered_cars, use_container_width=True)
+    st.caption(f"Showing {len(filtered_cars)} of {len(cars_df)} cars")
 
     st.divider()
     st.header("📝 Book a Car & Predict Fare")
@@ -107,7 +128,7 @@ if page == "Browse & Book":
     col1, col2 = st.columns(2)
 
     with col1:
-        car_name = st.selectbox("Choose a car", cars_df["car_name"])
+        car_name = st.selectbox("Choose a car", filtered_cars["car_name"] if len(filtered_cars) > 0 else cars_df["car_name"])
         car_row = cars_df[cars_df["car_name"] == car_name].iloc[0]
         car_type = car_row["car_type"]
         st.write(f"*Type:* {car_type} | *Seats:* {car_row['seats']} | *Fuel:* {car_row['fuel_type']}")
