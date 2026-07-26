@@ -185,7 +185,6 @@ if page == "Browse & Book":
             )
             with col:
                 st.markdown(card_html, unsafe_allow_html=True)
-                )
 
     with st.expander("📋 View as table"):
         st.dataframe(filtered_cars, use_container_width=True)
