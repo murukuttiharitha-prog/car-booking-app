@@ -11,7 +11,9 @@ st.set_page_config(page_title="Car Booking App", page_icon="🚗", layout="wide"
 # ---------- Load data ----------
 @st.cache_data
 def load_cars():
-    return pd.read_csv("cars.csv")
+    df = pd.read_csv("cars.csv")
+    df.columns = df.columns.str.strip()
+    return df
 
 # ---------- Generate synthetic training data + train model (in-app, no pkl files needed) ----------
 @st.cache_resource
